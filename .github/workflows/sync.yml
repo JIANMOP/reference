@@ -1,16 +1,17 @@
-name: 定时拉原仓库更新并推 gh-pages
+name: 仅同步 gh-pages 分支更新
 on:
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *' # 每天 0 点执行一次，可按需修改
+    - cron: '0 0 * * *'
 
 jobs:
-  sync:
+  sync-gh-pages:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout your gh-pages branch
         uses: actions/checkout@v4
         with:
+          ref: gh-pages
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -22,18 +23,11 @@ jobs:
       - name: Add upstream remote
         run: git remote add upstream https://github.com/jaywcjlove/reference.git
 
-      - name: Fetch upstream
-        run: git fetch upstream
+      - name: Fetch upstream gh-pages
+        run: git fetch upstream gh-pages
 
-      - name: Merge main branch
-        run: |
-          git checkout main
-          git merge upstream/main --no-edit
-
-      - name: Merge gh-pages branch
-        run: |
-          git checkout gh-pages
-          git merge upstream/gh-pages --no-edit
+      - name: Merge upstream gh-pages
+        run: git merge upstream/gh-pages --no-edit
 
       - name: Push changes
         uses: ad-m/github-push-action@master
