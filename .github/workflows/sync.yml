@@ -3,11 +3,13 @@ name: 同步上游 gh-pages
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 16 * * *'  # UTC 16:00 = 北京时间 0:00
+    - cron: '0 16 * * *'
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout 自己的 gh-pages
@@ -29,8 +31,7 @@ jobs:
         run: git fetch upstream gh-pages
 
       - name: 强制重置为上游版本
-        run: |
-          git reset --hard upstream/gh-pages
+        run: git reset --hard upstream/gh-pages
 
       - name: 推送到自己的仓库
         run: git push origin gh-pages --force
