@@ -1,35 +1,39 @@
-name: 仅同步 gh-pages 分支更新
+name: 同步上游 gh-pages
 on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
 
 jobs:
-  sync-gh-pages:
+  sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your gh-pages branch
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: gh-pages
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure Git
+      - name: 配置 Git
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
 
-      - name: Add upstream remote
+      - name: 添加上游
         run: git remote add upstream https://github.com/jaywcjlove/reference.git
 
-      - name: Fetch upstream gh-pages
-        run: git fetch upstream gh-pages
+      - name: 拉取上游
+        run: git fetch upstream
 
-      - name: Merge upstream gh-pages
+      - name: 切换到 gh-pages（修复版）
+        run: |
+          git checkout origin/gh-pages
+          git switch -c gh-pages
+
+      - name: 合并上游更新
         run: git merge upstream/gh-pages --no-edit
 
-      - name: Push changes
+      - name: 推送更新
         uses: ad-m/github-push-action@master
         with:
           branch: gh-pages
